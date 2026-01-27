@@ -53,7 +53,7 @@ const CaptainRegister = () => {
           setPassword(e.target.value);
         }}
         required placeholder='password' className='bg-[#eeeeee] rounded mb-5 px-2 py-2 w-full border text-base placeholder:text-sm'></input>
-        <button className='bg-[#111] text-white font-semibold rounded px-2 py-2 w-full border text-l '>Login</button>
+        <button className='bg-[#111] text-white font-semibold rounded px-2 py-2 w-full border text-l '>Create Account</button>
         <p className='text-center'>Already have a account? <Link to='/captain-login' className='text-blue-600'>Login here</Link></p>
       </form>
       </div>

@@ -5,7 +5,7 @@ import axios from 'axios';
 const UserLogin = () => {
   const[email,setEmail]=useState('');
   const[password,setPassword]=useState('');
-  const[userData,setUserData]=useState({});
+
   const navigate=useNavigate();
 
   const{user,setUser}=useContext(UserDataContext);
@@ -16,13 +16,17 @@ const UserLogin = () => {
       email:email,
       password:password,
     }
-    const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`,userData);
+    try{
+      const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`,userData);
 
-      const data=response.data;
-      setUser(data.user);
-      localStorage.setItem('userToken',data.token);
-      navigate('/home');
- 
+        const data=response.data;
+        setUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem('userToken',data.token);
+        navigate('/home');
+    }catch(error){
+      console.log(error);
+    }
 
     setEmail('');
     setPassword('');

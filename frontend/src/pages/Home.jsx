@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { UserDataContext } from "../context/ContextUser";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -7,6 +7,8 @@ import { SlArrowDown } from "react-icons/sl";
 import LocationSearchPanel from "../components/LocationSearchPanel";
 import VehiclePanel from "../components/VehiclePanel";
 import ConfirmedRide from "../components/ConfirmedRide";
+import LookingForDriver from "../components/LookingForDriver";
+import WaitingForDriver from "../components/WaitingForDriver";
 
 const Home = () => {
   const { user } = useContext(UserDataContext);
@@ -18,12 +20,17 @@ const Home = () => {
   const [panelOpen, setPanelOpen] = useState(false);
   const [vehiclePanel, setVehiclePanel] = useState(false);
   const [confirmedRidePanel, setConfirmedRidePanel] = useState(false);
+  const [lookingForDriverPanel,setLookingForDriverPanel] = useState(false);
+  const [waitingForDriverPanel,setWaitingForDriverPanel] = useState(false);
+
+
 
   // refs
   const panelRef = useRef(null);
   const vehiclePanelRef = useRef(null);
   const confirmedRidePanelRef = useRef(null);
-
+  const lookingForDriverRef=useRef(null);
+  const waitingForDriverRef=useRef(null);
   const submitHandler = (e) => e.preventDefault();
 
   /* ---------------- GSAP ANIMATIONS ---------------- */
@@ -54,6 +61,22 @@ const Home = () => {
       ease: "power2.out",
     });
   }, { dependencies: [confirmedRidePanel] });
+  //looking for a driver panel
+   useGSAP(() => {
+    gsap.to(lookingForDriverRef.current, {
+      transform: lookingForDriverPanel ? "translateY(0)" : "translateY(100%)",
+      duration: 0.4,
+      ease: "power2.out",
+    });
+  }, { dependencies: [lookingForDriverPanel] });
+  //drriver info panel
+  useGSAP(() => {
+    gsap.to(waitingForDriverRef.current, {
+      transform: waitingForDriverPanel ? "translateY(0)" : "translateY(100%)",
+      duration: 0.4,
+      ease: "power2.out",
+    });
+  }, { dependencies: [waitingForDriverPanel] });
 
   /* ---------------- PANEL HELPERS ---------------- */
 
@@ -67,7 +90,21 @@ const Home = () => {
     setVehiclePanel(false);
     setConfirmedRidePanel(true);
   };
-
+  const openDriverLookingPanel = () => {
+    setConfirmedRidePanel(false);
+    setLookingForDriverPanel(true);
+  };
+  const openDriverInfoPanel=()=>{
+    setLookingForDriverPanel(false);
+    setWaitingForDriverPanel(true);
+  };
+  useEffect(()=>{
+    if(!lookingForDriverPanel)return;
+    const timer=setTimeout(()=>{
+    openDriverInfoPanel();
+  },5000);
+  return () => clearTimeout(timer);
+  },[lookingForDriverPanel])
   /* ---------------- UI ---------------- */
 
   return (
@@ -92,8 +129,8 @@ const Home = () => {
       />
 
       {/* Bottom search section */}
-      <div className="absolute top-0 h-screen w-full flex flex-col justify-end">
-        <div className="bg-white h-[30%] p-5 relative">
+      <div className="absolute top-0 h-screen w-full flex flex-col  justify-end">
+        <div className="bg-white h-[30%] p-5 -mb-10 relative ">
           {panelOpen ? (
             <button onClick={() => setPanelOpen(false)}>
               <SlArrowDown />
@@ -164,7 +201,20 @@ const Home = () => {
           <span className="w-10 h-1.5 bg-gray-300 rounded-full"></span>
         </button>
 
-        <ConfirmedRide />
+        <ConfirmedRide confirmedVehicle={openDriverLookingPanel} />
+      </div>
+          {/*looking for a driver */}
+          <div
+          ref={lookingForDriverRef}
+        className="fixed bottom-0 w-full bg-white translate-y-full will-change-transform"
+      >
+        <LookingForDriver/>
+      </div>
+      {/*waiting for a driver */}
+          <div ref={waitingForDriverRef}
+        className="fixed bottom-0 w-full  bg-white translate-y-full will-change-transform"
+      >
+        <WaitingForDriver/>
       </div>
     </div>
   );

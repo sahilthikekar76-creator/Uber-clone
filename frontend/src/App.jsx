@@ -11,8 +11,11 @@ import UserLogout from './pages/UserLogout';
 import CaptainProtectedWrapper from './pages/CaptainProtectedWrapper';
 import CaptainHome from './pages/CaptainHome';
 import CaptainLogout from './pages/CaptainLogout';
+import { Toaster } from "react-hot-toast";
 const App = () => {
   return (
+    <>
+    <Toaster position="top-center" />
     <BrowserRouter>
     <Routes>
       <Route path='/' element={<Start/>}/>
@@ -26,6 +29,7 @@ const App = () => {
       <Route path='/captain-logout' element={<CaptainProtectedWrapper><CaptainLogout/></CaptainProtectedWrapper>}/>
     </Routes>
     </BrowserRouter>
+    </>
   )
 }
 

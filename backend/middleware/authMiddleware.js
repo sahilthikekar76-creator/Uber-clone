@@ -47,7 +47,7 @@ module.exports.authCaptain = async (req, res, next) => {
     try {
         let token;
 
-        // 1️⃣ From Authorization header
+        //  From Authorization header
         if (
             req.headers.authorization &&
             req.headers.authorization.startsWith('Bearer')
@@ -55,7 +55,7 @@ module.exports.authCaptain = async (req, res, next) => {
             token = req.headers.authorization.split(' ')[1];
         }
 
-        // 2️⃣ From cookies
+        // From cookies
         else if (req.cookies && req.cookies.token) {
             token = req.cookies.token;
         }

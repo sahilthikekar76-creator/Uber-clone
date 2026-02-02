@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { LuPhoneCall, LuMessageCircleMore, LuTrash2 } from "react-icons/lu";
 import PickupNavigationScreen from "./PickupNavigationScreen";
-
+import toast from 'react-hot-toast';
+import TripInProgress from "./TripInProgress";
 const ActiveRideScreen = ({ ride, onCancel }) => {
     const [showPickupNav, setShowPickupNav] = useState(false);
     const [status, setStatus] = useState("accepted");
   const { rider, trip } = ride;
-
+  useEffect(()=>{
+    if(status === "accepted") toast.success("Heading to pickup");
+    if(status === "arrived")toast.success("Waiting for rider");
+    if(status === "started")toast.success("Trip in progress");
+  },[status])
   return (
-    <div className="absolute inset-0 z-30 bg-white flex flex-col">
+    <div className="absolute inset-0 z-40 bg-white flex flex-col">
       {/* HEADER */}
       <div className="border-b-2 p-2">
   <div className="flex items-center justify-between">
@@ -18,16 +23,13 @@ const ActiveRideScreen = ({ ride, onCancel }) => {
     <div></div>
   </div>
 
-  {/* 👇 ADD STATUS TEXT HERE */}
-  <p className="text-xs text-green-600 mt-1 text-center">
-    {status === "accepted" && "Heading to pickup"}
-    {status === "arrived" && "Waiting for rider"}
-    {status === "started" && "Trip in progress"}
-  </p>
-</div>
+    
+
+      </div>
       {/* SCROLLABLE CONTENT */}
       <div className="flex-1 overflow-y-auto pb-28">
         {/* RIDER CARD */}
+        {status!=="started" &&(<>
         <div className="mx-4 mt-4 bg-gray-50 rounded-xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
@@ -117,11 +119,12 @@ const ActiveRideScreen = ({ ride, onCancel }) => {
             <LuTrash2 className="text-white text-xl" />
             <span className="text-white text-sm">Cancel</span>
           </button>
-        </div>
+        </div> 
+        </>)}
       </div>
 
       {/* BOTTOM CTA */}
-      <div className="fixed bottom-0 left-0 w-full bg-yellow-400 p-4">
+      {status!=="started" &&(<div className="fixed bottom-0 left-0 w-full bg-yellow-400 p-4">
         <button 
          onClick={()=>{
             if(status==="accepted"){
@@ -134,9 +137,9 @@ const ActiveRideScreen = ({ ride, onCancel }) => {
         className="w-full bg-black text-white py-3 rounded-xl text-lg font-semibold active:scale-95 transition">
             {status === "accepted" && "Go to Pickup"}
             {status === "arrived" && "Start Trip"}
-            {status === "started" && "End Trip"}
         </button>
-      </div>
+      </div>)}
+     
       {showPickupNav &&(
         <PickupNavigationScreen ride={ride}
         onArrived={()=>{
@@ -146,6 +149,15 @@ const ActiveRideScreen = ({ ride, onCancel }) => {
             
         }/>
       )}
+      {status === "started" && (
+    <TripInProgress
+      ride={ride}
+      onEndTrip={() => {
+        toast.success("Trip completed 🎉");
+        onCancel();
+      }}
+    />
+  )}
     </div>
   );
 };

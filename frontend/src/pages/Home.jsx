@@ -9,6 +9,7 @@ import VehiclePanel from "../components/VehiclePanel";
 import ConfirmedRide from "../components/ConfirmedRide";
 import LookingForDriver from "../components/LookingForDriver";
 import WaitingForDriver from "../components/WaitingForDriver";
+import MapView from "../components/MapView";
 
 const Home = () => {
   const { user } = useContext(UserDataContext);
@@ -122,11 +123,9 @@ const Home = () => {
       </div>
 
       {/* Map */}
-      <img
-        src="https://miro.medium.com/v2/resize:fit:1280/0*gwMx05pqII5hbfmX.gif"
-        alt="map"
-        className="h-full w-full object-cover"
-      />
+      <div className="absolute inset-0 z-0">
+                  <MapView />
+        </div>
 
       {/* Bottom search section */}
       <div className="absolute top-0 h-screen w-full flex flex-col  justify-end">

@@ -1,6 +1,7 @@
 import React from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { MdOutlineTurnRight } from "react-icons/md";
+import MapView from "./MapView";
 
 const PickupNavigationScreen = ({ ride, onArrived }) => {
   const { trip } = ride;
@@ -32,11 +33,7 @@ const PickupNavigationScreen = ({ ride, onArrived }) => {
 
       {/* MAP PLACEHOLDER */}
       <div className="flex-1">
-        <img
-          src="https://miro.medium.com/v2/resize:fit:1280/0*gwMx05pqII5hbfmX.gif"
-          alt="map"
-          className="h-full w-full object-cover"
-        />
+       <MapView/>
       </div>
 
       {/* PICKUP CARD */}

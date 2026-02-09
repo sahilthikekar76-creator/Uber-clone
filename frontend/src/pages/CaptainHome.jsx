@@ -7,6 +7,7 @@ import { BsMoonStars } from "react-icons/bs";
 import OnlineToggle from '../components/OnlineToggle';
 import IncomingRideCard from '../components/IncomingRideCard';
 import ActiveRideScreen from '../components/ActiveRideScreen';
+import MapView from '../components/MapView';
 const CaptainHome = () => {
   const [isOnline, setIsOnline] = useState(false);
   const[incomingRequests,setIncomingRequests]=useState([]);
@@ -98,13 +99,10 @@ const handleDeclineRide=(rideId)=>{
       </div>
 
     
-          {/* Map */}
-          <img
-            src="https://miro.medium.com/v2/resize:fit:1280/0*gwMx05pqII5hbfmX.gif"
-            alt="map"
-            className="h-full w-full object-cover"
-          />
-    
+         {/* Map Background */}
+          <div className="absolute inset-0 z-0">
+            <MapView />
+          </div>
           {/* Bottom section */}
           {!isOnline && <div className="absolute top-0 h-screen w-full flex flex-col  justify-end">
             <div className="bg-white  h-[35%] p-3 -mb-10 relative flex flex-col gap-4">

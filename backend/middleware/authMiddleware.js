@@ -5,6 +5,10 @@ const captainModel = require('../models/captainModel');
 const blackListTokenModel = require('../models/blackListTokenModel');
 
 module.exports.authUser = async (req, res, next) => {
+        // ✅ ALLOW CORS PREFLIGHT
+        if (req.method === "OPTIONS") {
+            return next();
+        }
     try {
         let token;
 
@@ -44,6 +48,11 @@ module.exports.authUser = async (req, res, next) => {
 };
 
 module.exports.authCaptain = async (req, res, next) => {
+
+        // ✅ ALLOW CORS PREFLIGHT
+    if (req.method === "OPTIONS") {
+        return next();
+    }
     try {
         let token;
 

@@ -1,58 +1,90 @@
-import React from 'react'
+import React from "react";
 import { FaRegUser } from "react-icons/fa6";
-const VehiclePanel = (props) => {
+
+const VehiclePanel = ({ fare, distanceTime, setConfirmedRidePanel }) => {
+
+  // 🛑 VERY IMPORTANT GUARD
+  if (!fare || !distanceTime) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        Calculating fare...
+      </div>
+    );
+  }
+
   return (
-    <div>
-        <div  onClick={()=>props.setConfirmedRidePanel()} className="flex px-3 py-6 mt-3  items-center justify-between w-full rounded-xl hover:border-2 border-black">
-          <img src="https://png.pngtree.com/png-vector/20241121/ourlarge/pngtree-a-realistic-white-car-png-image_14450181.png" alt="" className="h-16" />
-          <div className="w-1/2 ">
-            <h4 className="flex items-center gap-2 text-lg font-semibold">
-                UberGo
-                <span className="flex items-center gap-1 text-sm text-gray-600">
-                  <FaRegUser />
-                  4
-                </span>
-            </h4>
+    <div className="p-4 space-y-4">
 
-            <h5 className="font-medium text-sm">2 mins away 15:24</h5>
-            <p className="font-xl text-xs text-gray-600">Affordable, compact rides</p>
-          </div>
-          <h2 className='text-lg font-semibold'>193.20</h2>
-        </div>
-        <div onClick={()=>props.setConfirmedRidePanel()} className="flex px-3 py-6 mt-3  items-center justify-between w-full rounded-xl hover:border-2 border-black">
-          <img src="https://tse2.mm.bing.net/th/id/OIP.nojLg57TpNrPh7SMDxGQOgHaHa?pid=Api&P=0&h=180" alt="" className="h-16" />
-          <div className="w-1/2 ">
-            <h4 className="flex items-center gap-2 text-lg font-semibold">
-                Moto
-                <span className="flex items-center gap-1 text-sm text-gray-600">
-                  <FaRegUser />
-                  1
-                </span>
-            </h4>
+      {/* CAR */}
+      <div
+        onClick={() => setConfirmedRidePanel()}
+        className="flex items-center justify-between p-4 rounded-xl border hover:border-black cursor-pointer"
+      >
+        <img
+          src="https://png.pngtree.com/png-vector/20241121/ourlarge/pngtree-a-realistic-white-car-png-image_14450181.png"
+          className="h-14"
+          alt="car"
+        />
 
-            <h5 className="font-medium text-sm">2 mins away 15:24</h5>
-            <p className="font-xl text-xs text-gray-600">Affordable motorcycle rides</p>
-          </div>
-          <h2 className='text-lg font-semibold'>65</h2>
+        <div className="w-1/2">
+          <h4 className="flex items-center gap-2 font-semibold">
+            UberGo <FaRegUser /> 4
+          </h4>
+          <p className="text-sm text-gray-600">
+            {distanceTime.distance} • {distanceTime.duration}
+          </p>
         </div>
-        <div  onClick={()=>props.setConfirmedRidePanel()} className="flex px-3 py-6 mt-3  items-center justify-between w-full rounded-xl hover:border-2 border-black">
-          <img src="https://p7.hiclipart.com/preview/185/46/346/bajaj-auto-auto-rickshaw-car-bajaj-qute-auto-rickshaw.jpg" alt="" className="h-14" />
-          <div className="w-1/2 ">
-            <h4 className="flex items-center gap-2 text-lg font-semibold">
-                UberAuto
-                <span className="flex items-center gap-1 text-sm text-gray-600">
-                  <FaRegUser />
-                  3
-                </span>
-            </h4>
 
-            <h5 className="font-medium text-sm">2 mins away 15:24</h5>
-            <p className="font-xl text-xs text-gray-600">Affordable rides</p>
-          </div>
-          <h2 className='text-lg font-semibold'>92.80</h2>
+        <h2 className="font-semibold">₹{fare.car}</h2>
+      </div>
+
+      {/* MOTO */}
+      <div
+        onClick={() => setConfirmedRidePanel()}
+        className="flex items-center justify-between p-4 rounded-xl border hover:border-black cursor-pointer"
+      >
+        <img
+          src="https://tse2.mm.bing.net/th/id/OIP.nojLg57TpNrPh7SMDxGQOgHaHa?pid=Api"
+          className="h-14"
+          alt="moto"
+        />
+
+        <div className="w-1/2">
+          <h4 className="flex items-center gap-2 font-semibold">
+            Moto <FaRegUser /> 1
+          </h4>
+          <p className="text-sm text-gray-600">
+            {distanceTime.distance} • {distanceTime.duration}
+          </p>
         </div>
+
+        <h2 className="font-semibold">₹{fare.motorcycle}</h2>
+      </div>
+
+      {/* AUTO */}
+      <div
+        onClick={() => setConfirmedRidePanel()}
+        className="flex items-center justify-between p-4 rounded-xl border hover:border-black cursor-pointer"
+      >
+        <img
+          src="https://p7.hiclipart.com/preview/185/46/346/bajaj-auto-auto-rickshaw-car-bajaj-qute-auto-rickshaw.jpg"
+          className="h-14"
+          alt="auto"
+        />
+
+        <div className="w-1/2">
+          <h4 className="flex items-center gap-2 font-semibold">
+            UberAuto <FaRegUser /> 3
+          </h4>
+          <p className="text-sm text-gray-600">
+            {distanceTime.distance} • {distanceTime.duration}
+          </p>
+        </div>
+
+        <h2 className="font-semibold">₹{fare.auto}</h2>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default VehiclePanel
+export default VehiclePanel;

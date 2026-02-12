@@ -1,86 +1,81 @@
-const mongoose=require('mongoose');
-const bcrypt=require('bcryptjs')
-const jwt=require('jsonwebtoken');
-const captainSchema=new mongoose.Schema({
-    fullname:{
-        firstname:{
-            type:String,
-            required:true,
-            minLength:[3,'First name must be at least 3 characters long']
-        },
-        lastname:{
-            type:String,
-            minLength:[3,'Last name must be at least 3 characters long']
-        },
-    },
-    email:{
-        type:String,
-        required:true,
-        unique:true,
-        lowercase:true,
-        match: [
-            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-            'Please enter a valid email address'
-        ]
-    },
-    password:{
-        type:String,
-        required:true,
-        select:false,
-    },
-    socketId:{
-        type:String,
-    },
-    status:{
-        type:String,
-        enum:['active','inactive'],
-        default:'inactive',
-    },
-    vehicle:{
-        color:{
-            type:String,
-            required:true,
-            minLength:[3,'Color must be at least 3 characters long']
-        },
-        plate:{
-            type:String,
-            required:true,
-            minLength:[3,'Plate must be at least 3 characters long']
-        },
-        capacity:{
-            type:Number,
-            required:true,
-            min:[1,'Capacity must be at least 1']
-        },
-        vehicleType:{
-            type:String,
-            required:true,
-            enum:['car','motorcycle','auto']
-        }
-    },
-    location:{
-        lat:{
-            type:Number,    
-        },
-        lng:{
-            type:Number,
-        }
-    }
-})
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
+const captainSchema = new mongoose.Schema({
+  fullname: {
+    firstname: {
+      type: String,
+      required: true,
+      minLength: 3,
+    },
+    lastname: {
+      type: String,
+      minLength: 3,
+    },
+  },
 
-captainSchema.methods.generateToken=function(){
-    const token=jwt.sign({_id:this._id},process.env.JWT_SECRET,{expiresIn:'24h'})
-    return token;
-}
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+  },
 
-captainSchema.methods.comparePassword=async function(password){
-    return await bcrypt.compare(password,this.password);
-}
+  password: {
+    type: String,
+    required: true,
+    select: false,
+  },
 
-captainSchema.statics.hashPassword=async function(password){
-    return await bcrypt.hash(password,10);
-}
+  socketId: String,
 
-const captainModel=mongoose.model('captain',captainSchema);
-module.exports=captainModel;
+  status: {
+    type: String,
+    enum: ["active", "inactive"],
+    default: "inactive",
+  },
+
+  vehicle: {
+    color: String,
+    plate: String,
+    capacity: Number,
+    vehicleType: {
+      type: String,
+      enum: ["car", "motorcycle", "auto"],
+    },
+  },
+
+  // 🔥 GEO LOCATION (THIS IS THE KEY)
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
+    coordinates: {
+      type: [Number], // [lng, lat]
+      required: true,
+    },
+  },
+});
+
+/* 🔥 REQUIRED FOR GEO QUERIES */
+captainSchema.index({ location: "2dsphere" });
+
+/* AUTH HELPERS */
+captainSchema.methods.generateToken = function () {
+  return jwt.sign({ _id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: "24h",
+  });
+};
+
+captainSchema.methods.comparePassword = async function (password) {
+  return bcrypt.compare(password, this.password);
+};
+
+captainSchema.statics.hashPassword = async function (password) {
+  return bcrypt.hash(password, 10);
+};
+
+module.exports = mongoose.model("captain", captainSchema);

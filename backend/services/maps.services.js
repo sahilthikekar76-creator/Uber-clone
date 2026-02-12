@@ -1,5 +1,5 @@
 const axios = require("axios");
-
+const captainModel=require('../models/captainModel');
 /**
  * Convert address → coordinates (lat, lng)
  * Uses OpenStreetMap Nominatim API
@@ -127,4 +127,17 @@ module.exports.getAutoCompleteSuggestions = async (input) => {
     lat: Number(place.lat),
     lng: Number(place.lon),
   }));
+};
+
+module.exports.getCaptainsInTheRadius = async (lat, lng, radiusKm) => {
+  const radiusInRadians = radiusKm / 6378;
+
+  return await captainModel.find({
+    status: "active",
+    location: {
+      $geoWithin: {
+        $centerSphere: [[lng, lat], radiusInRadians],
+      },
+    },
+  });
 };

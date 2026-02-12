@@ -8,48 +8,75 @@ import OnlineToggle from '../components/OnlineToggle';
 import IncomingRideCard from '../components/IncomingRideCard';
 import ActiveRideScreen from '../components/ActiveRideScreen';
 import MapView from '../components/MapView';
+import { SocketContext } from '../context/SocketContext';
 const CaptainHome = () => {
-  const [isOnline, setIsOnline] = useState(false);
-  const[incomingRequests,setIncomingRequests]=useState([]);
-  const[activeRide,setActiveRide]=useState(null);
-  const {captain}=useContext(CaptainDataContext);
+  const [incomingRequests, setIncomingRequests] = useState([]);
+const [activeRide, setActiveRide] = useState(null);
+const [isOnline, setIsOnline] = useState(false);
+  const{captain}=useContext(CaptainDataContext);
+  const{socket}=useContext(SocketContext);
+  useEffect(() => {
+  if (!captain?._id) return;
 
-  useEffect(()=>{
-    if (isOnline) {
-    const timer = setTimeout(() => {
-      setIncomingRequests([
-        {
-          id: 12345,
-          rider: {
-            name: "Ananya Sharma",
-            avatar: "https://randomuser.me/api/portraits/women/45.jpg",
-            rating: 4.8,
-            payment: "UPI"
+  // 🔗 join socket
+  socket.emit("join", {
+    userType: "captain",
+    userId: captain._id,
+  });
+
+  const updateLocation = () => {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        
+        socket.emit("update-location-captain", {
+          userId: captain._id,
+          location: {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
           },
-          trip: {
-            pickup: "MG Road",
-            drop: "Airport",
-            fare: 420,
-            distance: "12 km",
-            eta: "3 min"
-          }
-        }
-      ]);
-    }, 3000);
+        });
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+      },
+      {
+        enableHighAccuracy: true,
+      }
+    );
+  };
 
-    return () => clearTimeout(timer);
-  } else {
-    setIncomingRequests([]);
-  }
-}, [isOnline])
+  // ⏱ update every 5 seconds (BEST PRACTICE)
+  updateLocation(); // initial call
+  const locationInterval = setInterval(updateLocation, 5000);
 
-const handleAcceptRide=(ride)=>{
+  return () => clearInterval(locationInterval);
+}, [captain?._id]);
+
+useEffect(() => {
+  socket.on("new-ride", (ride) => {
+    console.log("New ride received:", ride);
+
+    setIncomingRequests((prev) => [...prev, ride]);
+  });
+
+  return () => {
+    socket.off("new-ride");
+  };
+}, []);
+
+  
+ 
+const handleAcceptRide = (ride) => {
   setActiveRide(ride);
-  setIncomingRequests([]);
-}
-const handleDeclineRide=(rideId)=>{
-  setIncomingRequests(prev=>prev.filter(r=>r.id!==rideId))
-}
+  setIncomingRequests([]); 
+};
+const handleDeclineRide = (rideId) => {
+  setIncomingRequests((prev) =>
+    prev.filter((r) => r._id !== rideId)
+  );
+};
   return (
     <div className="h-screen relative overflow-hidden">
           {/* Top Wrapper */}
@@ -104,8 +131,8 @@ const handleDeclineRide=(rideId)=>{
             <MapView />
           </div>
           {/* Bottom section */}
-          {!isOnline && <div className="absolute top-0 h-screen w-full flex flex-col  justify-end">
-            <div className="bg-white  h-[35%] p-3 -mb-10 relative flex flex-col gap-4">
+          {!isOnline && <div className="absolute top-0 h-screen w-full flex flex-col  justify-end pointer-events-none ">
+            <div className="bg-white  h-[35%] p-3 -mb-10 relative flex flex-col gap-4 pointer-events-auto">
                <div className="flex items-center justify-between">
                 <div className="flex items-centre gap-2">
                   <img

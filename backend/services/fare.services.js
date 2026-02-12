@@ -22,10 +22,17 @@ async function getFare(pickup, destination) {
   if (!pickup || !destination) {
     throw new Error("Pickup and destination are required");
   }
+   const pickupCoords = typeof pickup === "string"
+    ? await mapService.getAddressCoordinate(pickup)
+    : pickup;
+
+  const destinationCoords = typeof destination === "string"
+    ? await mapService.getAddressCoordinate(destination)
+    : destination;
 
   const distanceTime = await mapService.getDistanceTime(
-    pickup,
-    destination
+    pickupCoords,
+    destinationCoords
   );
 
   const distanceInKm = distanceTime.distance.value / 1000;

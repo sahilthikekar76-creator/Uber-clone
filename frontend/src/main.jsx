@@ -4,12 +4,15 @@ import ContextUser from './context/ContextUser.jsx';
 import ContextCaptain from './context/ContextCaptain.jsx';
 import './index.css';
 import App from './App.jsx';
+import Socketprovider from './context/SocketContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ContextCaptain>
       <ContextUser>
-      <App />
+        <Socketprovider>
+          <App />
+        </Socketprovider>
     </ContextUser>
     </ContextCaptain>
     

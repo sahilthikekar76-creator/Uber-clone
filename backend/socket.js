@@ -51,6 +51,13 @@ function initializeSocket(server){
         socket.on('disconnect',()=>{
             console.log(`Client disconnected:${socket.id}`);
         });
+        socket.on("captain-status-change", async ({ captainId, status }) => {
+            await captainModel.findByIdAndUpdate(captainId, {
+            status,
+            socketId: socket.id,
+        });
+    });
+    
     });
 }
 
@@ -61,5 +68,10 @@ function sendMessageToSocketId(socketId,message){
         console.log('Socket.io not iinitialized');
     }
 }
+function sendRideToCaptain(socketId, ride) {
+    if (io && socketId) {
+        io.to(socketId).emit("new-ride", ride);
+    }
+}
 
-module.exports={initializeSocket,sendMessageToSocketId};
+module.exports={initializeSocket,sendMessageToSocketId,sendRideToCaptain};

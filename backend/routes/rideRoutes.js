@@ -20,4 +20,6 @@ router.get(
   rideController.getFare
 );
 
+
+
 module.exports = router;

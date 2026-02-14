@@ -9,11 +9,19 @@ import IncomingRideCard from '../components/IncomingRideCard';
 import ActiveRideScreen from '../components/ActiveRideScreen';
 import MapView from '../components/MapView';
 import { SocketContext } from '../context/SocketContext';
+import axios from 'axios';
 const CaptainHome = () => {
   const [incomingRequests, setIncomingRequests] = useState([]);
 const [activeRide, setActiveRide] = useState(null);
 const [isOnline, setIsOnline] = useState(false);
   const{captain}=useContext(CaptainDataContext);
+  const[stats,setStats]=useState({
+    totalTrips:0,
+    totalDistance:0,
+    totalEarnings:0,
+  });
+  const [onlineSeconds, setOnlineSeconds] = useState(0);
+  console.log(captain);
   const{socket}=useContext(SocketContext);
   useEffect(() => {
   if (!captain?._id) return;
@@ -52,21 +60,78 @@ const [isOnline, setIsOnline] = useState(false);
   const locationInterval = setInterval(updateLocation, 5000);
 
   return () => clearInterval(locationInterval);
-}, [captain?._id]);
+}, [isOnline,captain?._id]);
 
 useEffect(() => {
-  socket.on("new-ride", (ride) => {
-    console.log("New ride received:", ride);
+  if (!captain?._id) return;
 
-    setIncomingRequests((prev) => [...prev, ride]);
+  socket.emit("captain-status-change", {
+    captainId: captain._id,
+    status: isOnline ? "active" : "inactive",
   });
+}, [isOnline]);
 
-  return () => {
-    socket.off("new-ride");
+useEffect(() => {
+  if (!socket) return;
+
+  const handleNewRide = (ride) => {
+    const formattedRide = {
+      id: ride._id,
+
+      rider: {
+        name: `${ride.user.fullname.firstname} ${ride.user.fullname.lastname}`,
+        avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+        rating: 4.8,
+        payment: "Cash",
+      },
+
+      trip: {
+        pickup: ride.pickup.address,
+        drop: ride.destination.address,
+        fare: ride.fare,
+        distance: `${ride.distance} km`,
+        eta: "5 min",
+      },
+    };
+
+    setIncomingRequests((prev) => [...prev, formattedRide]);
   };
-}, []);
 
-  
+  socket.on("new-ride", handleNewRide);
+
+  return () => socket.off("new-ride", handleNewRide);
+}, [socket]);
+
+ useEffect(()=>{
+  const fetchDashboard=async()=>{
+    try {
+      const res=await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/captains/dashboard`,
+        {
+          headers:{
+            Authorization:`Bearer ${localStorage.getItem('captainToken')}`,
+          },
+        }
+      );
+      setStats(res.data.stats);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  fetchDashboard();
+ },[]); 
+
+ useEffect(()=>{
+  let timer;
+  if(isOnline){
+    timer=setInterval(()=>{
+      setOnlineSeconds((prev)=>prev+1);
+    },1000);
+  }
+  return ()=>clearInterval(timer);
+ },[isOnline]);
+
+ const hoursOnline = (onlineSeconds / 3600).toFixed(1);
  
 const handleAcceptRide = (ride) => {
   setActiveRide(ride);
@@ -140,13 +205,13 @@ const handleDeclineRide = (rideId) => {
                     className="w-14 h-14 rounded-full object-cover"
                 />
                 <div className="">
-                  <h2 className="text-lg font-semibold">Santh Saxsena</h2>
+                  <h2 className="text-lg font-semibold">{captain?.fullname?.firstname} {captain?.fullname?.lastname}</h2>
                   <p className="text-sm text-gray-500">Basic Level</p>
                 </div>
 
                 </div>
              <div className="text-right">
-                    <p className="text-lg font-semibold text-green-600">₹1,240</p>
+                    <p className="text-lg font-semibold text-green-600">₹{stats.totalEarnings}</p>
                     <p className="text-sm text-gray-500">Earned</p> 
                 </div>
                </div>
@@ -154,21 +219,21 @@ const handleDeclineRide = (rideId) => {
                 <div className="text-center flex flex-col items-center ">
                   <CiClock2 className='text-gray-400 h-8 w-8'/>
                   <div className="">
-                    <p className="text-lg font-semibold">10.2</p>
+                    <p className="text-lg font-semibold">{hoursOnline}</p>
                     <p className="text-sm text-gray-500">Hours Online</p>
                   </div>   
                 </div>
                 <div className="text-center flex flex-col items-center ">
                   <IoSpeedometerOutline className='text-gray-400 h-8 w-8'/>
                   <div className="">
-                    <p className="text-lg font-semibold">30KM</p>
+                    <p className="text-lg font-semibold">{stats.totalDistance} KM</p>
                   <p className="text-sm text-gray-500">Total Distance</p>
                   </div>
                 </div>
                 <div className="text-center flex flex-col items-center ">
                   <CgNotes className='text-gray-400 h-8 w-8'/>
                   <div className="">
-                    <p className="text-lg font-semibold">20</p>
+                    <p className="text-lg font-semibold">{stats.totalTrips}</p>
                   <p className="text-sm text-gray-500">Total Trips</p>  
                   </div>
                 </div>

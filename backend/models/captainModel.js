@@ -58,6 +58,20 @@ const captainSchema = new mongoose.Schema({
       required: true,
     },
   },
+  stats:{
+    totalTrips:{
+      type:Number,
+      default:0,
+    },
+    totalDistance: {
+    type: Number,
+    default: 0, // in KM
+    },
+    totalEarnings: {
+      type: Number,
+      default: 0,
+    },
+  },
 });
 
 /* 🔥 REQUIRED FOR GEO QUERIES */

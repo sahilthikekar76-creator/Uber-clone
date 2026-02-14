@@ -80,4 +80,12 @@ module.exports.logoutCaptain=async(req,res)=>{
             error: error.message
         });
     }
-}
+};
+module.exports.getCaptainDashboard=async(req,res)=>{
+    const captain=await captainModel.findById(req.captain._id);
+
+    res.status(200).json({
+        stats:captain.stats,
+        status:captain.status,
+    });
+};

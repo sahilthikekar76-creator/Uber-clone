@@ -4,6 +4,8 @@ const { validationResult } = require('express-validator');
 const { getFare } = require("../services/fare.services");
 const {sendMessageToSocketId}=require('../socket');
 const rideModel = require('../models/rideModel');
+const{sendRideToCaptain}=require('../socket');
+
 module.exports.createRide = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -41,13 +43,11 @@ module.exports.createRide = async (req, res) => {
   // 📡 Notify captains
   captainsInTheRadius.forEach((captain) => {
     if (captain.socketId) {
-      sendMessageToSocketId(captain.socketId, {
-        event: "new-ride",
-        data: rideWithUser,
-      });
+      sendRideToCaptain(captain.socketId, rideWithUser);
     }
   });
-
+  console.log(captainsInTheRadius);
+  console.log(rideWithUser);
   // ✅ SEND RESPONSE AT THE END
   return res.status(201).json(rideWithUser);
 

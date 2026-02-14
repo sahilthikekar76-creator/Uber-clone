@@ -18,7 +18,9 @@ router.post('/login',[
     body('password').isLength({min:6}).withMessage('Password must be at least 6 characters long'),
 ],cpatainController.loginCaptain)
 
-router.get('/profile',authCaptain,cpatainController.getCaptainProfile)
+router.get('/profile',authCaptain,cpatainController.getCaptainProfile);
+
+router.get('/dashboard',authCaptain,cpatainController.getCaptainDashboard);
 
 router.post('/logout',authCaptain,cpatainController.logoutCaptain)
 module.exports=router;
